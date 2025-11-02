@@ -1,9 +1,11 @@
 /* ===========================
            MAIN CONTENT
    =========================== */
-#main-content {
+#main-content{
     opacity: 0;
     filter: blur(20px);
+    position: relative;
+    z-index: 2;
 }
 
 #main-content.fade-in {

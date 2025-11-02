@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function(){
     vt323.load().then((loadedFace) => {
         document.fonts.add(loadedFace);
 
-        fuzzyText = new FuzzyText(fuzzyCanvas, 'CONNECTING', {
-            fontSize: 6,
+        fuzzyText = new FuzzyText(fuzzyCanvas, 'CONNECTING INTERFACE', {
+            fontSize: 5,
             fontWeight: 400,
             fontFamily: "VT323, monospace",
             color: '#00FF41',
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function(){
             loading_screen.classList.add('tv-off');
             setTimeout(() => {
                 loading_screen.style.display = 'none';
-                main_screen.style.display = 'block';
+                main_screen.style.display = 'grid';
                 main_screen.classList.add('fade-in');
                 document.body.removeChild(whiteFlash);
                 // Clean resources
@@ -188,5 +188,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     // Init
-    updateLoadingBar();
+    setTimeout(() => {
+        updateLoadingBar();
+    }, 200);
 });

@@ -64,18 +64,15 @@
     animation: screenFlicker 0.5s ease-in-out;
 }
 
-@keyframes scanlines {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(10px); }
-}
-
 #loading-screen{
     position: fixed;
     width: 100vw;
     height: 100vh;
     display: flex;
+    background: transparent;
     justify-content: center;
     align-items: center;
+    z-index: 5;
 }
 
 #loading-content{
