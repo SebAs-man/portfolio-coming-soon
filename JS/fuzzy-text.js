@@ -7,7 +7,7 @@ class FuzzyText {
         // Options
         this.fontSizeRem = options.fontSize || 8;
         this.fontWeight = options.fontWeight || 400;
-        this.fontFamily = options.fontFamily || 'Jersey 15, monospace';
+        this.fontFamily = options.fontFamily || 'monospace';
         this.color = options.color || '#00FF41';
         this.baseIntensity = options.baseIntensity || 0.18;
         this.hoverIntensity = options.hoverIntensity || 0.5;
