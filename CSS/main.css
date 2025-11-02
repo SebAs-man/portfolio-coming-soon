@@ -1,0 +1,22 @@
+/* ===========================
+           MAIN CONTENT
+   =========================== */
+#main-content {
+    opacity: 0;
+    filter: blur(20px);
+}
+
+#main-content.fade-in {
+    animation: fadeInContent 1.5s ease-out forwards;
+}
+
+@keyframes fadeInContent {
+    0% {
+        opacity: 0;
+        filter: blur(20px) brightness(0.3);
+    }
+    100% {
+        opacity: 1;
+        filter: blur(0px) brightness(1);
+    }
+}

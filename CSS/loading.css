@@ -1,0 +1,46 @@
+/* ===========================
+        LOADING SCREEN
+=========================== */
+#loading-screen{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#loading-content{
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+#fuzzy-canvas{
+    display: block;
+    margin: 0 auto 2rem;
+}
+
+#loading-bar-container{
+    width: 35vw;
+    height: 3vh;
+    border: 2px solid #00FF41;
+    border-radius: 0;
+    overflow: hidden;
+    margin: 0 auto 1rem;
+}
+
+#loading-bar{
+    height: 100%;
+    background: linear-gradient(90deg, #00FF41, #00E5FF);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+#loading-percentage{
+    font-size: 1.5rem;
+    color: #00FF41;
+}
