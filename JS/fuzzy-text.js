@@ -26,6 +26,8 @@ class FuzzyText {
         this.fontSizePx = 0;
         this.textBounds = {};
 
+        this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
         this.boundHandleMouseMove = this.handleMouseMove.bind(this);
         this.boundHandleMouseLeave = this.handleMouseLeave.bind(this);
         this.boundHandleTouchMove = this.handleTouchMove.bind(this);
@@ -101,14 +103,22 @@ class FuzzyText {
         };
     }
 
+    updateText(newText) {
+        this.text = newText;
+        this.calculateMetrics();
+    }
+
     /**
      * Add event listeners
      */
     addEventListeners() {
-        this.canvas.addEventListener('mousemove', this.boundHandleMouseMove);
-        this.canvas.addEventListener('mouseleave', this.boundHandleMouseLeave);
-        this.canvas.addEventListener('touchmove', this.boundHandleTouchMove, { passive: false });
-        this.canvas.addEventListener('touchend', this.boundHandleTouchEnd);
+        if (!this.isTouchDevice) {
+            this.canvas.addEventListener('mousemove', this.boundHandleMouseMove);
+            this.canvas.addEventListener('mouseleave', this.boundHandleMouseLeave);
+        } else {
+            this.canvas.addEventListener('touchmove', this.boundHandleTouchMove, { passive: false });
+            this.canvas.addEventListener('touchend', this.boundHandleTouchEnd);
+        }
         // Listen for window resize to recalculate
         window.addEventListener('resize', this.boundHandleResize);
     }
@@ -189,14 +199,16 @@ class FuzzyText {
             cancelAnimationFrame(this.animationId);
         }
 
-        // Limpiar temporizador de 'debounce' si existe
         clearTimeout(this.debounceTimer);
 
-        // Usar las referencias bindeades para eliminar listeners
-        this.canvas.removeEventListener('mousemove', this.boundHandleMouseMove);
-        this.canvas.removeEventListener('mouseleave', this.boundHandleMouseLeave);
-        this.canvas.removeEventListener('touchmove', this.boundHandleTouchMove);
-        this.canvas.removeEventListener('touchend', this.boundHandleTouchEnd);
-        window.removeEventListener('resize', this.boundHandleResize); // <-- ¡CAMBIO CLAVE!
+        if (!this.isTouchDevice) {
+            this.canvas.removeEventListener('mousemove', this.boundHandleMouseMove);
+            this.canvas.removeEventListener('mouseleave', this.boundHandleMouseLeave);
+        } else {
+            this.canvas.removeEventListener('touchmove', this.boundHandleTouchMove);
+            this.canvas.removeEventListener('touchend', this.boundHandleTouchEnd);
+        }
+
+        window.removeEventListener('resize', this.boundHandleResize);
     }
 }

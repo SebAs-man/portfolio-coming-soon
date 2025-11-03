@@ -8,20 +8,77 @@ document.addEventListener('DOMContentLoaded', function(){
     const loading_percentage = document.getElementById('loading-percentage');
     const fuzzyCanvas = document.getElementById('fuzzy-canvas');
 
+    let fuzzyText, fuzzyPercentage;
+    let dotsInterval, recoveryDotsInterval;
+
+    // Load font and initialize
     const vt323 = new FontFace('VT323', 'url(./fonts/VT323/VT323-Regular.ttf)');
-    let fuzzyText;
     vt323.load().then((loadedFace) => {
         document.fonts.add(loadedFace);
+        initializeLoadingScreen();
+    }).catch(() => {
+        initializeLoadingScreen();
+    })
 
+    function initializeLoadingScreen() {
         fuzzyText = new FuzzyText(fuzzyCanvas, 'CONNECTING INTERFACE', {
             fontSize: 5,
             fontWeight: 400,
-            fontFamily: "VT323, monospace",
+            fontFamily: 'VT323, monospace',
             color: '#00FF41',
             baseIntensity: 0.2,
             hoverIntensity: 0.5
         });
-    });
+        dotsInterval = animateDots(fuzzyText, 'CONNECTING INTERFACE');
+        createFuzzyPercentage();
+        setTimeout(() => {
+            updateLoadingBar();
+        }, 500);
+    }
+
+    function createFuzzyPercentage() {
+        const percentageCanvas = document.createElement('canvas');
+        percentageCanvas.id = 'percentage-canvas';
+
+        const statsDiv = document.getElementById('loading-stats');
+        if (!statsDiv) {
+            const newStatsDiv = document.createElement('div');
+            newStatsDiv.id = 'loading-stats';
+            const barContainer = document.getElementById('loading-bar-container');
+            barContainer.parentNode.insertBefore(newStatsDiv, barContainer.nextSibling);
+            newStatsDiv.appendChild(percentageCanvas);
+        } else {
+            statsDiv.appendChild(percentageCanvas);
+        }
+
+        const oldPercentage = document.getElementById('loading-percentage');
+        if (oldPercentage) {
+            oldPercentage.remove();
+        }
+
+        fuzzyPercentage = new FuzzyText(percentageCanvas, '0%', {
+            fontSize: 3,
+            fontWeight: 400,
+            fontFamily: 'VT323, monospace',
+            color: '#00FF41',
+            baseIntensity: 0.2,
+            hoverIntensity: 0.5
+        });
+    }
+
+    /**
+     * Anima los puntos suspensivos
+     */
+    function animateDots(fuzzyTextInstance, baseText) {
+        const dotStates = ['', '.', '..', '...'];
+        let currentDotIndex = 0;
+
+        return setInterval(() => {
+            const newText = baseText + dotStates[currentDotIndex];
+            fuzzyTextInstance.updateText(newText);
+            currentDotIndex = (currentDotIndex + 1) % dotStates.length;
+        }, 500);
+    }
 
     let progress = 0;
     let lastProgress = 0;
@@ -48,17 +105,21 @@ document.addEventListener('DOMContentLoaded', function(){
             const increment = getProgressIncrement();
             progress = Math.min(progress + increment, 99);
 
-            // Random glitches
             if (Math.random() < 0.15) {
                 progress = Math.max(lastProgress, progress - Math.random() * 5);
                 loading_bar.style.transition = 'width 0.05s linear';
+                loading_bar.classList.add('glitch');
+                setTimeout(() =>{
+                    loading_bar.classList.remove('glitch');
+                }, 300)
             } else {
                 loading_bar.style.transition = 'width 0.3s ease';
             }
 
             lastProgress = progress;
             loading_bar.style.width = progress + '%';
-            loading_percentage.textContent = Math.floor(progress) + '%';
+            const percentageText = Math.floor(progress) + '%';
+            fuzzyPercentage.updateText(percentageText);
 
             const nextDelay = 100 + Math.random() * 150;
             setTimeout(updateLoadingBar, nextDelay);
@@ -87,16 +148,19 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function startFlickerSequence() {
         const loadingContent = document.querySelector('#loading-content');
+        if (dotsInterval) {
+            clearInterval(dotsInterval);
+        }
+
         loading_screen.classList.add('flicker');
 
         setTimeout(() => {
             loading_screen.classList.remove('flicker');
             loadingContent.style.opacity = '0';
-
             setTimeout(() => {
                 showErrorScreen();
             }, 300);
-        }, 495);
+        }, 1000);
     }
 
     function showErrorScreen() {
@@ -113,11 +177,7 @@ document.addEventListener('DOMContentLoaded', function(){
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            font-family: 'VT323', monospace;
-            font-size: 5rem;
-            color: #FF1744;
-            text-shadow: 0 0 20px rgba(255, 23, 68, 0.8);
-            line-height: 1.4;
+            z-index: 10;
         `;
         errorMessage.appendChild(errorLinesContainer);
 
@@ -144,6 +204,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
         const lineDiv = document.createElement('canvas');
         lineDiv.className = 'error-line';
+        const hasEllipsis = lines[index].includes('...');
+        const baseText = hasEllipsis ? lines[index].replace('...', '') : lines[index];
+
         const errorFuzzy = new FuzzyText(lineDiv, lines[index], {
             fontSize: 4,
             fontWeight: 400,
@@ -156,6 +219,10 @@ document.addEventListener('DOMContentLoaded', function(){
         });
         container.appendChild(lineDiv);
 
+        if (hasEllipsis && index === lines.length - 1) {
+            recoveryDotsInterval = animateDots(errorFuzzy, baseText);
+        }
+
         // Encourage the appearance
         setTimeout(() => {
             lineDiv.classList.add('show');
@@ -166,6 +233,10 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function initiateSystemRecovery() {
+        if (recoveryDotsInterval) {
+            clearInterval(recoveryDotsInterval);
+        }
+
         const whiteFlash = document.createElement('div');
         whiteFlash.className = 'white-flash';
         document.body.appendChild(whiteFlash);
@@ -182,9 +253,13 @@ document.addEventListener('DOMContentLoaded', function(){
                 main_screen.classList.add('fade-in');
                 document.body.removeChild(whiteFlash);
                 // Clean resources
-                fuzzyText.destroy();
+                if (fuzzyText) fuzzyText.destroy();
+                if (fuzzyPercentage) fuzzyPercentage.destroy();
+                const errorCanvases = document.querySelectorAll('.error-line');
+                errorCanvases.forEach(() => {
+                });
             }, 1200);
-        }, 100);
+        }, 400);
     }
 
     // Init

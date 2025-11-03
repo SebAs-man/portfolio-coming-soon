@@ -111,6 +111,7 @@
     );
     box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
     transition: width 0.3s ease;
+    position: relative;
 }
 
 #loading-bar::before {
@@ -132,6 +133,41 @@
 @keyframes shimmer {
     0% { left: -100%; }
     100% { left: 200%; }
+}
+
+@keyframes barGlitch {
+    0%, 100% {
+        transform: translateX(0) scaleX(1);
+        filter: hue-rotate(0deg) brightness(1);
+    }
+    10% {
+        transform: translateX(-2px) scaleX(1.01);
+        filter: hue-rotate(10deg) brightness(1.2);
+    }
+    20% {
+        transform: translateX(2px) scaleX(0.99);
+        filter: hue-rotate(-5deg) brightness(0.9);
+    }
+    30% {
+        transform: translateX(-1px) scaleX(1.005);
+        filter: hue-rotate(5deg) brightness(1.1);
+    }
+    40% {
+        transform: translateX(1px) scaleX(0.995);
+        filter: hue-rotate(-10deg) brightness(1);
+    }
+    50% {
+        transform: translateX(0) scaleX(1);
+        filter: hue-rotate(0deg) brightness(1);
+    }
+}
+
+#loading-bar.glitch {
+    animation: barGlitch 0.3s ease-in-out;
+}
+
+#loading-bar-container.glitch {
+    animation: barGlitch 0.3s ease-in-out;
 }
 
 #loading-stats {
