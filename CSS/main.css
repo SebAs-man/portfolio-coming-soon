@@ -5,7 +5,27 @@
     opacity: 0;
     filter: blur(20px);
     position: relative;
-    z-index: 2;
+    z-index: 5;
+    animation: textFlicker 10s linear infinite;
+}
+
+@keyframes textFlicker {
+    0%, 19.9%, 20.1%, 40.2%, 60.1%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 5px #00FF41, 0 0 10px #00FF41;
+    }
+    20% {
+        opacity: 0.8;
+        text-shadow: 0 0 5px #00FF41;
+    }
+    40% {
+        opacity: 0.7;
+        text-shadow: none;
+    }
+    60% {
+        opacity: 1.0;
+        text-shadow: 0 0 10px #00FF41;
+    }
 }
 
 #main-content.fade-in {
