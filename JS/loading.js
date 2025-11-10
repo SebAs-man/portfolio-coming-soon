@@ -11,22 +11,40 @@ document.addEventListener('DOMContentLoaded', function(){
     let fuzzyText, fuzzyPercentage;
     let dotsInterval, recoveryDotsInterval;
 
+    function getResponsiveSizes() {
+        const width = window.innerWidth;
+
+        if (width <= 360) {
+            return { connecting: 2, percentage: 1.5, error: 2 };
+        } else if (width <= 480) {
+            return { connecting: 2.5, percentage: 1.8, error: 2.5 };
+        } else if (width <= 768) {
+            return { connecting: 3.5, percentage: 2.2, error: 3 };
+        } else if (width <= 1024) {
+            return { connecting: 4, percentage: 2.5, error: 3.5 };
+        } else {
+            return { connecting: 5, percentage: 3, error: 4 };
+        }
+    }
+
     // Load font and initialize
     const vt323 = new FontFace('VT323', 'url(./fonts/VT323/VT323-Regular.ttf)');
     vt323.load().then((loadedFace) => {
         document.fonts.add(loadedFace);
         initializeLoadingScreen();
     }).catch(() => {
+        console.warn('VT323 font failed to load, using fallback');
         initializeLoadingScreen();
     })
 
     function initializeLoadingScreen() {
+        const sizes = getResponsiveSizes();
         const loadingContent = document.getElementById('loading-content');
         if (loadingContent) {
             loadingContent.classList.add('tv-on');
         }
         fuzzyText = new FuzzyText(fuzzyCanvas, 'CONNECTING to \nSEBASMAN PAGE', {
-            fontSize: 5,
+            fontSize: sizes.connecting,
             fontWeight: 400,
             fontFamily: 'VT323, monospace',
             multiline: true,
@@ -35,13 +53,13 @@ document.addEventListener('DOMContentLoaded', function(){
             hoverIntensity: 0.5,
             enableHover: true
         });
-        createFuzzyPercentage();
+        createFuzzyPercentage(sizes.percentage);
         setTimeout(() => {
             updateLoadingBar();
         }, 500);
     }
 
-    function createFuzzyPercentage() {
+    function createFuzzyPercentage(fontSize) {
         const percentageCanvas = document.createElement('canvas');
         percentageCanvas.id = 'percentage-canvas';
 
@@ -62,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
 
         fuzzyPercentage = new FuzzyText(percentageCanvas, '0%', {
-            fontSize: 2.5,
+            fontSize: fontSize,
             fontWeight: 400,
             fontFamily: 'VT323, monospace',
             color: '#16F284',
@@ -132,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function(){
         } else {
             progress = 99;
             loading_bar.style.width = '99%';
-            loading_percentage.textContent = '99%';
+            fuzzyPercentage.updateText('99%');
             showWarningMessage();
             setTimeout(() => {
                 startFlickerSequence();
@@ -194,13 +212,15 @@ document.addEventListener('DOMContentLoaded', function(){
             return;
         }
 
+        const sizes = getResponsiveSizes();
+
         const lineDiv = document.createElement('canvas');
         lineDiv.className = 'error-line';
         const hasEllipsis = lines[index].includes('...');
         const baseText = hasEllipsis ? lines[index].replace('...', '') : lines[index];
 
         const errorFuzzy = new FuzzyText(lineDiv, lines[index], {
-            fontSize: 4,
+            fontSize: sizes.error,
             fontWeight: 400,
             fontFamily: 'VT323, monospace',
             color: '#F2C849',

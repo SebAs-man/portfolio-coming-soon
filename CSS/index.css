@@ -95,6 +95,7 @@ body{
     pointer-events: none;
     overflow: hidden;
     mix-blend-mode: screen;
+    opacity: 1;
 }
 
 #webgl-filter-container canvas {
@@ -105,38 +106,21 @@ body{
 /* ===========================
             RESPONSIVE
    =========================== */
-:root {
-    --loading-bar-width: 40vw;
-    --loading-bar-height: 4vh;
-    --fuzzy-font-size: 8rem;
-    --percentage-font-size: 1.5rem;
-    --error-font-size: 5rem;
-}
-
 @media (max-width: 1024px) {
     :root {
         --loading-bar-width: 60vw;
         --loading-bar-height: 4vh;
-        --fuzzy-font-size: 6rem;
-        --percentage-font-size: 1.3rem;
-        --error-font-size: 4rem;
+        --fuzzy-scale: 0.75;
+        --percentage-scale: 0.8;
+        --error-scale: 0.75;
     }
 
-    #fuzzy-canvas {
-        max-width: 90vw;
+    #loading-content{
+        width: 95vw;
     }
 
-    #loading-bar-container {
-        width: var(--loading-bar-width);
-        height: var(--loading-bar-height);
-    }
-
-    #loading-stats {
-        width: var(--loading-bar-width);
-    }
-
-    #loading-warning {
-        font-size: 0.8rem;
+    #webgl-filter-container{
+        opacity: 0.7;
     }
 }
 
@@ -144,34 +128,35 @@ body{
     :root {
         --loading-bar-width: 75vw;
         --loading-bar-height: 3.5vh;
-        --fuzzy-font-size: 4rem;
-        --percentage-font-size: 1.2rem;
-        --error-font-size: 3rem;
+        --loading-bar-min-height: 28px;
+        --fuzzy-scale: 0.5;
+        --percentage-scale: 0.6;
+        --error-scale: 0.6;
     }
 
-    #loading-screen::before {
-        background-image:
-                repeating-linear-gradient(
-                        0deg,
-                        rgba(0, 255, 65, 0.03) 0px,
-                        rgba(0, 255, 65, 0.03) 1px,
-                        transparent 1px,
-                        transparent 3px
-                );
+    #loading-screen {
+        z-index: 150; /* Aún más alto en móvil */
     }
 
-    #loading-screen::after {
-        opacity: 0.03 !important;
+    #loading-bar-container {
+        border-width: 1.5px;
+        box-shadow:
+                0 0 8px rgba(0, 255, 65, 0.3),
+                inset 0 0 8px rgba(0, 255, 65, 0.1);
     }
 
-    #loading-bar::before {
-        animation: shimmer 3s infinite;
+    #loading-stats {
+        gap: 0.5rem;
     }
 
-    #error-lines-container {
-        font-size: var(--error-font-size) !important;
-        line-height: 1.3 !important;
-        padding: 0 1rem;
+    #webgl-filter-container {
+        opacity: 0.5;
+    }
+
+    #fuzzy-canvas,
+    #percentage-canvas,
+    .error-line {
+        filter: drop-shadow(0 0 5px rgba(0, 0, 0, 0.8));
     }
 }
 
@@ -179,63 +164,73 @@ body{
     :root {
         --loading-bar-width: 85vw;
         --loading-bar-height: 3vh;
-        --fuzzy-font-size: 3rem;
-        --percentage-font-size: 1rem;
-        --error-font-size: 2rem;
+        --loading-bar-min-height: 25px;
+        --fuzzy-scale: 0.4;
+        --percentage-scale: 0.5;
+        --error-scale: 0.5;
+    }
+
+    #loading-content {
+        width: 100vw;
+        padding: 0 1rem;
     }
 
     #loading-bar-container {
-        border: 1px solid #00FF41;
+        border-width: 1px;
         box-shadow:
                 0 0 5px rgba(0, 255, 65, 0.3),
                 inset 0 0 5px rgba(0, 255, 65, 0.1);
     }
 
-    #loading-bar {
-        box-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
-    }
-
     #loading-warning {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
         line-height: 1.2;
     }
 
     #error-lines-container {
-        font-size: var(--error-font-size) !important;
-        line-height: 1.2 !important;
-        padding: 0 0.5rem;
+        padding: 0.5rem !important;
     }
 
-    #loading-screen::before {
-        animation: none;
-    }
-
-    #loading-screen::after {
-        animation: none;
+    #webgl-filter-container {
+        opacity: 0.3; /* Muy sutil en móviles pequeños */
     }
 }
 
-@media (max-width: 768px) and (orientation: landscape) {
+@media (max-width: 896px) and (orientation: landscape) {
     :root {
-        --loading-bar-height: 5vh;
-        --fuzzy-font-size: 3rem;
-        --error-font-size: 2.5rem;
+        --loading-bar-width: 60vw;
+        --loading-bar-height: 8vh;
+        --loading-bar-min-height: 30px;
     }
 
-    #error-lines-container {
-        line-height: 1.1 !important;
+    #loading-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    #fuzzy-canvas {
+        margin-bottom: 1rem;
     }
 }
+
+@media (max-width: 360px) {
+    :root {
+        --fuzzy-scale: 0.35;
+        --percentage-scale: 0.45;
+        --error-scale: 0.45;
+    }
+
+    #loading-bar-container {
+        min-height: 20px;
+    }
+}
+
 
 @media (hover: none) and (pointer: coarse) {
-    #loading-bar::before {
-        animation: shimmer 4s infinite;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    #loading-screen {
-        background-color: #000000;
+    #fuzzy-canvas:active,
+    #percentage-canvas:active,
+    .error-line:active {
+        opacity: 0.9;
     }
 }
 
@@ -246,9 +241,14 @@ body{
         transition-duration: 0.01ms !important;
     }
 
-    #loading-screen::before,
-    #loading-screen::after,
-    #loading-bar::before {
-        animation: none !important;
+    #webgl-filter-container {
+        display: none !important;
+    }
+}
+
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+    #webgl-filter-container {
+        opacity: 0.8;
     }
 }
