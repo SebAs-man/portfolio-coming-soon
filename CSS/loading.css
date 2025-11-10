@@ -1,69 +1,6 @@
 /* ===========================
         LOADING SCREEN
 =========================== */
-@keyframes screenFlicker {
-    0%, 100% {
-        opacity: 1;
-        filter: brightness(1);
-    }
-    5% {
-        opacity: 0.3;
-        filter: brightness(0.5);
-    }
-    10% {
-        opacity: 1;
-        filter: brightness(1.2);
-    }
-    15% {
-        opacity: 0.4;
-        filter: brightness(0.6);
-    }
-    20% {
-        opacity: 1;
-        filter: brightness(1);
-    }
-    25% {
-        opacity: 0.2;
-        filter: brightness(0.3);
-    }
-    30% {
-        opacity: 1;
-        filter: brightness(1.3);
-    }
-    35% {
-        opacity: 0.5;
-        filter: brightness(0.7);
-    }
-    40% {
-        opacity: 1;
-        filter: brightness(1);
-    }
-    50% {
-        opacity: 0.3;
-        filter: brightness(0.4);
-    }
-    60% {
-        opacity: 1;
-        filter: brightness(1.2);
-    }
-    70% {
-        opacity: 0.6;
-        filter: brightness(0.8);
-    }
-    80% {
-        opacity: 1;
-        filter: brightness(1);
-    }
-    90% {
-        opacity: 0.4;
-        filter: brightness(0.5);
-    }
-}
-
-#loading-screen.flicker {
-    animation: screenFlicker 0.5s ease-in-out;
-}
-
 #loading-screen{
     position: fixed;
     width: 100vw;
@@ -73,14 +10,77 @@
     justify-content: center;
     align-items: center;
     z-index: 5;
+    padding: 1rem;
+    box-sizing: border-box;
 }
 
-#loading-content{
+#loading-content,
+#error-message{
+    background-color: rgba(72, 73, 89, 0.75);
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    border-radius: 1rem;
+    display: none;
+}
+
+@keyframes tv-on {
+    0% {
+        clip-path: circle(1% at 50% 50%);
+        transform: scale(0.01, 1);
+        opacity: 0.5;
+    }
+    30% {
+        clip-path: circle(50% at 50% 50%);
+        transform: scale(0.01, 1);
+        opacity: 0.8;
+    }
+    60% {
+        transform: scale(1, 1);
+        opacity: 1;
+    }
+    100% {
+        clip-path: circle(100% at 50% 50%);
+        transform: scale(1, 1);
+        opacity: 1;
+    }
+}
+
+#loading-content.tv-on,
+#error-message.tv-on {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     transition: opacity 0.3s ease;
+    animation: tv-on 1.2s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
+}
+
+@keyframes tv-off {
+    0% {
+        clip-path: circle(100% at 50% 50%);
+        transform: scale(1, 1);
+        opacity: 1;
+    }
+    30% {
+        transform: scale(1, 1);
+        opacity: 1;
+    }
+    60% {
+        clip-path: circle(50% at 50% 50%);
+        transform: scale(0.01, 1);
+        opacity: 1;
+    }
+    100% {
+        clip-path: circle(1% at 50% 50%);
+        transform: scale(0.01, 1);
+        opacity: 0.8;
+    }
+}
+
+#loading-content.tv-off,
+#error-message.tv-off {
+    animation: tv-off 1s cubic-bezier(0.645, 0.045, 0.355, 1.000) forwards;
 }
 
 #fuzzy-canvas{
@@ -91,10 +91,10 @@
 #loading-bar-container{
     width: 40vw;
     height: 4vh;
-    border: 2px solid #00FF41;
+    border: 2px solid #16F284;
     box-shadow:
-            0 0 10px rgba(0, 255, 65, 0.3),
-            inset 0 0 10px rgba(0, 255, 65, 0.1);
+            0 0 10px rgba(22, 242, 132, 0.3),
+            inset 0 0 10px rgba(22, 242, 132, 0.1);
     overflow: hidden;
     margin: 0 auto 0.5rem;
     border-radius: 0.2rem;
@@ -105,11 +105,11 @@
     height: 100%;
     width: 0;
     background: linear-gradient(90deg,
-        #00FF41 0%,
-        #00E5FF 50%,
-        #00FF41 100%
+        #16F284 0%,
+        #16F2F2 50%,
+        #16F284 100%
     );
-    box-shadow: 0 0 20px rgba(0, 255, 65, 0.6);
+    box-shadow: 0 0 20px rgba(22, 242, 132, 0.6);
     transition: width 0.3s ease;
     position: relative;
 }
@@ -124,7 +124,7 @@
     background: linear-gradient(
             90deg,
             transparent 0%,
-            rgba(255, 255, 255, 0.4) 50%,
+            rgba(242, 213, 213, 0.4) 50%,
             transparent 100%
     );
     animation: shimmer 2s infinite;
@@ -178,17 +178,10 @@
     margin: 0 auto 1rem;
 }
 
-#loading-percentage {
-    font-size: 1.5rem;
-    color: #00FF41;
-    text-shadow: 0 0 10px rgba(0, 255, 65, 0.8);
-    font-family: 'VT323', monospace;
-}
-
 #loading-warning {
-    font-size: 1rem;
-    color: #FF6B35;
-    text-shadow: 0 0 10px rgba(255, 107, 53, 0.8);
+    font-size: 1.5rem;
+    color: #D94B32;
+    text-shadow: 0 0 10px rgba(217, 75, 50, 0.8);
     font-family: 'VT323', monospace;
     opacity: 0;
     transition: opacity 0.5s ease;

@@ -21,15 +21,20 @@ document.addEventListener('DOMContentLoaded', function(){
     })
 
     function initializeLoadingScreen() {
-        fuzzyText = new FuzzyText(fuzzyCanvas, 'CONNECTING INTERFACE', {
+        const loadingContent = document.getElementById('loading-content');
+        if (loadingContent) {
+            loadingContent.classList.add('tv-on');
+        }
+        fuzzyText = new FuzzyText(fuzzyCanvas, 'CONNECTING to \nSEBASMAN PAGE', {
             fontSize: 5,
             fontWeight: 400,
             fontFamily: 'VT323, monospace',
-            color: '#00FF41',
+            multiline: true,
+            color: '#16F284',
             baseIntensity: 0.2,
-            hoverIntensity: 0.5
+            hoverIntensity: 0.5,
+            enableHover: true
         });
-        dotsInterval = animateDots(fuzzyText, 'CONNECTING INTERFACE');
         createFuzzyPercentage();
         setTimeout(() => {
             updateLoadingBar();
@@ -57,17 +62,17 @@ document.addEventListener('DOMContentLoaded', function(){
         }
 
         fuzzyPercentage = new FuzzyText(percentageCanvas, '0%', {
-            fontSize: 3,
+            fontSize: 2.5,
             fontWeight: 400,
             fontFamily: 'VT323, monospace',
-            color: '#00FF41',
+            color: '#16F284',
             baseIntensity: 0.2,
             hoverIntensity: 0.5
         });
     }
 
     /**
-     * Anima los puntos suspensivos
+     * Animates the ellipsis
      */
     function animateDots(fuzzyTextInstance, baseText) {
         const dotStates = ['', '.', '..', '...'];
@@ -77,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function(){
             const newText = baseText + dotStates[currentDotIndex];
             fuzzyTextInstance.updateText(newText);
             currentDotIndex = (currentDotIndex + 1) % dotStates.length;
-        }, 500);
+        }, 350);
     }
 
     let progress = 0;
@@ -111,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 loading_bar.classList.add('glitch');
                 setTimeout(() =>{
                     loading_bar.classList.remove('glitch');
-                }, 300)
+                }, 400)
             } else {
                 loading_bar.style.transition = 'width 0.3s ease';
             }
@@ -147,49 +152,36 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     function startFlickerSequence() {
-        const loadingContent = document.querySelector('#loading-content');
+        const loadingContent = document.getElementById('loading-content');
         if (dotsInterval) {
             clearInterval(dotsInterval);
         }
-
-        loading_screen.classList.add('flicker');
-
+        if (loadingContent) {
+            loadingContent.classList.add('tv-off');
+        }
         setTimeout(() => {
-            loading_screen.classList.remove('flicker');
-            loadingContent.style.opacity = '0';
-            setTimeout(() => {
-                showErrorScreen();
-            }, 300);
-        }, 1000);
+            if (loadingContent) {
+                loadingContent.style.opacity = '0';
+                loadingContent.style.display = 'none';
+            }
+            showErrorScreen();
+        }, 500);
     }
 
     function showErrorScreen() {
         const errorMessage = document.getElementById('error-message');
-
-        errorMessage.classList.remove('hidden');
-        errorMessage.classList.add('show');
-
-        const errorLinesContainer = document.createElement('div');
-        errorLinesContainer.id = 'error-lines-container';
-        errorLinesContainer.style.cssText = `
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 10;
-        `;
-        errorMessage.appendChild(errorLinesContainer);
+        if(errorMessage){
+            errorMessage.classList.add('tv-on');
+        }
 
         const errorLines = [
             '[ TRANSMISSION FAILURE ]\n' +
             'Probe Status: UNKNOWN\n' +
-            'Mission Data: CORRUPTED',
+            'Mission Data: CORRUPTED\n',
             'ATTEMPTING RECOVERY...'
         ];
 
-        // Mostrar líneas una por una con efecto de escritura
-        typeErrorLines(errorLines, errorLinesContainer, 0, () => {
+        typeErrorLines(errorLines, errorMessage, 0, () => {
             setTimeout(() => {
                 initiateSystemRecovery();
             }, 1500);
@@ -211,11 +203,12 @@ document.addEventListener('DOMContentLoaded', function(){
             fontSize: 4,
             fontWeight: 400,
             fontFamily: 'VT323, monospace',
-            color: '#FF1744',
+            color: '#F2C849',
             baseIntensity: 0.3,
             hoverIntensity: 0.7,
             multiline: true,
-            lineHeight: 1.4
+            lineHeight: 1.4,
+            enableHover: true
         });
         container.appendChild(lineDiv);
 
@@ -229,10 +222,11 @@ document.addEventListener('DOMContentLoaded', function(){
             setTimeout(() => {
                 typeErrorLines(lines, container, index + 1, callback);
             }, 800);
-        }, 50);
+        }, 150);
     }
 
     function initiateSystemRecovery() {
+        const errorMessage = document.getElementById('error-message');
         if (recoveryDotsInterval) {
             clearInterval(recoveryDotsInterval);
         }
@@ -246,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }, 10);
         // TV animation
         setTimeout(() => {
-            loading_screen.classList.add('tv-off');
+            errorMessage.classList.add('tv-off');
             setTimeout(() => {
                 loading_screen.style.display = 'none';
                 main_screen.style.display = 'grid';
@@ -258,12 +252,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 const errorCanvases = document.querySelectorAll('.error-line');
                 errorCanvases.forEach(() => {
                 });
-            }, 1200);
-        }, 400);
+            }, 750);
+        }, 500);
     }
-
-    // Init
-    setTimeout(() => {
-        updateLoadingBar();
-    }, 200);
 });
